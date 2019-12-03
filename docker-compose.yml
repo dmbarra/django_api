@@ -1,0 +1,29 @@
+version: '3'
+services:
+  api_db:
+    restart: always
+    image: postgres
+    environment:
+      - POSTGRES_USER:"postgres"
+      - POSTGRES_PASSWORD:"postgres"
+      - POSTGRES_DB:"todo_avenue_development"
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./tmp/db:/var/lib/postgresql/data
+
+  qaapit_app:
+    container_name: qaapi_app
+    build: .
+    environment:
+      TODO_AVENUE_DATABASE_SERVER_NAME: "database"
+      TODO_AVENUE_DATABASE_SERVER_PORT: "5432"
+      TODO_AVENUE_DATABASE_USER: "postgres"
+      TODO_AVENUE_DATABASE_PASSWORD: "postgres"
+    command: bash -c "python manage.py runserver 0.0.0.0:8000"
+    ports:
+      - "8000:8000"
+    links:
+      - api_db:database
+    depends_on:
+      - api_db
