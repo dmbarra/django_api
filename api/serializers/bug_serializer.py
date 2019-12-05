@@ -6,4 +6,4 @@ from api.models.bug_model import Bug
 class BugSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Bug
-        fields = ['title', 'description', 'priority']
+        fields = ['id', 'title', 'description', 'priority']
