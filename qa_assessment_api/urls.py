@@ -16,11 +16,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 from rest_framework import routers
-from api.views import user_view, group_view, token_view
+from api.views import user_view, group_view, token_view, bug_view
 
 router = routers.DefaultRouter()
 router.register(r'api/users', user_view.UserViewSet)
 router.register(r'api/groups', group_view.GroupViewSet)
+router.register(r'api/bugs', bug_view.BugViewSet)
 
 urlpatterns = [
     path('_manager/super', admin.site.urls),
