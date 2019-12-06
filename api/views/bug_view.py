@@ -26,6 +26,6 @@ class BugViewSet(viewsets.ModelViewSet):
         auth_token = request.META.get('HTTP_AUTHORIZATION', '').replace('Token ', '')
         user = Token.objects.get(key=auth_token).user
         bug_serializer = BugSerializer(data=request.data)
-        bug_serializer.is_valid()
+        bug_serializer.is_valid(raise_exception=True)
         bug_serializer.save(author=user)
         return Response(status=status.HTTP_201_CREATED)

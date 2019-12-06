@@ -1,7 +1,8 @@
-from django.contrib.auth.models import User
-from rest_framework import viewsets
+from django.contrib.auth.models import User, Group
+from rest_framework import viewsets, status
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
 
 from api.permissions.action_based_permission import ActionBasedPermission
 from api.serializers.user_serializer import UserSerializer
@@ -25,3 +26,11 @@ class UserViewSet(viewsets.ModelViewSet):
             return User.objects.all().order_by('-date_joined')
         else:
             return User.objects.filter(username=user.username).order_by('-date_joined')
+
+    def create(self, request):
+        group = Group.objects.filter(name='candidates')
+        user_serializer = UserSerializer(data=request.data)
+        user_serializer.is_valid(raise_exception=True)
+        user_serializer.save(groups=group)
+        return Response(status=status.HTTP_201_CREATED)
+
