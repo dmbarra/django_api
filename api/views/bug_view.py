@@ -1,13 +1,19 @@
 from rest_framework import viewsets, status
 
 from rest_framework.authtoken.models import Token
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from api.models.bug_model import Bug
+from api.permissions.action_based_permission import ActionBasedPermission
 from api.serializers.bug_serializer import BugSerializer
 
 
 class BugViewSet(viewsets.ModelViewSet):
+    permission_classes = (ActionBasedPermission,)
+    action_permissions = {
+        IsAuthenticated: ['update', 'partial_update', 'destroy', 'list', 'retrieve', 'create'],
+    }
     queryset = Bug.objects.order_by('-created_at',)
     serializer_class = BugSerializer
 

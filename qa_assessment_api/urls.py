@@ -19,12 +19,12 @@ from rest_framework import routers
 from api.views import user_view, group_view, token_view, bug_view
 
 router = routers.DefaultRouter()
-router.register(r'api/users', user_view.UserViewSet)
-router.register(r'api/groups', group_view.GroupViewSet)
-router.register(r'api/bugs', bug_view.BugViewSet)
+router.register(r'v1/api/users', user_view.UserViewSet)
+router.register(r'v1/api/groups', group_view.GroupViewSet)
+router.register(r'v1/api/bugs', bug_view.BugViewSet)
 
 urlpatterns = [
     path('_manager/super', admin.site.urls),
     path('', include(router.urls)),
-    path('api/login', token_view.TokenViewSet.login),
+    path('v1/api/login', token_view.TokenViewSet.login),
 ]

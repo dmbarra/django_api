@@ -1,12 +1,18 @@
 from django.contrib.auth.models import Group, User
 from rest_framework import viewsets, status
 from rest_framework.authtoken.models import Token
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from api.permissions.action_based_permission import ActionBasedPermission
 from api.serializers.group_serializer import GroupSerializer
 
 
 class GroupViewSet(viewsets.ModelViewSet):
+    permission_classes = (ActionBasedPermission,)
+    action_permissions = {
+        IsAuthenticated: ['update', 'partial_update', 'destroy', 'list', 'retrieve', 'create'],
+    }
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
 
