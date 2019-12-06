@@ -7,6 +7,7 @@ class Bug(models.Model):
     title = models.CharField(max_length=100)
     description = models.CharField(max_length=1000)
     priority = models.CharField(max_length=50)
+    status = models.CharField(max_length=10, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
