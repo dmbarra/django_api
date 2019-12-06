@@ -9,9 +9,9 @@ The project is hosted at [this Heroku App](https://qa-test.avenuecode.com/).<br>
 The project is build [Jenkins](https://jenkins.avenuecode.com/job/QA-TEST/). 
 ## Main gems/libraries used ##
 
-* [Django](http://getbootstrap.com/)
-* [psycopg2](https://github.com/plataformatec/devise)
-* [djangorestframework](http://rspec.info/)
+* [Django](https://www.djangoproject.com/)
+* [psycopg2](https://pypi.org/project/psycopg2/)
+* [djangorestframework](https://www.django-rest-framework.org/)
 
 ## Contributing ##
 
