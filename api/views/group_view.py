@@ -15,6 +15,7 @@ class GroupViewSet(viewsets.ModelViewSet):
     }
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
+    http_method_names = ['get', 'post']
 
     def get_queryset(self):
         auth_token = self.request.META.get('HTTP_AUTHORIZATION', '').replace('Token ', '')
