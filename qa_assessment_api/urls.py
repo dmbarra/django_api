@@ -26,6 +26,5 @@ router.register(r'api/bugs', bug_view.BugViewSet)
 urlpatterns = [
     path('_manager/super', admin.site.urls),
     path('', include(router.urls)),
-    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('api/login', token_view.TokenViewSet.login),
 ]
