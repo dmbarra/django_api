@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+from future.moves import sys
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -76,16 +78,31 @@ WSGI_APPLICATION = 'qa_assessment_api.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'todo_avenue_development',
-        'USER': os.environ.get('TODO_AVENUE_DATABASE_USER'),
-        'PASSWORD': os.environ.get('TODO_AVENUE_DATABASE_PASSWORD'),
-        'HOST': os.environ.get('TODO_AVENUE_DATABASE_SERVER_NAME'),
-        'PORT': os.environ.get('TODO_AVENUE_DATABASE_SERVER_PORT')
+if any([arg in sys.argv for arg in ['jenkins', 'test']]):
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': 'test.db'
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'todo_avenue_development',
+            'USER': os.environ.get('TODO_AVENUE_DATABASE_USER'),
+            'PASSWORD': os.environ.get('TODO_AVENUE_DATABASE_PASSWORD'),
+            'HOST': os.environ.get('TODO_AVENUE_DATABASE_SERVER_NAME'),
+            'PORT': os.environ.get('TODO_AVENUE_DATABASE_SERVER_PORT'),
+            'TEST': {
+                'ENGINE': 'django.db.backends.sqlite3',
+            },
+        }
+    }
+
+
+SOUTH_TESTS_MIGRATE = False
+
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
