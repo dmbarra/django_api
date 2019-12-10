@@ -1,8 +1,6 @@
-from django.views.decorators.http import require_http_methods
 from rest_framework import viewsets, status
 
 from rest_framework.authtoken.models import Token
-from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
@@ -56,6 +54,6 @@ class BugViewSet(viewsets.ModelViewSet):
                        description=request.data['description'],
                        priority=request.data['priority'],
                        status='UPDATED')
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response(bug_serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_404_NOT_FOUND)
