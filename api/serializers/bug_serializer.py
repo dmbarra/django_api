@@ -1,5 +1,4 @@
 from rest_framework import serializers
-
 from api.models.bug_model import Bug
 
 

@@ -31,7 +31,7 @@ class BugViewSet(viewsets.ModelViewSet):
         bug_serializer = BugSerializer(data=request.data)
         bug_serializer.is_valid(raise_exception=True)
         bug_serializer.save(author=user, status='NEW')
-        return Response(status=status.HTTP_201_CREATED)
+        return Response(bug_serializer.data, status=status.HTTP_201_CREATED)
 
     def destroy(self, request, *args, **kwargs):
         auth_token = request.META.get(HTTP_AUTHORIZATION, '').replace('Token ', '')

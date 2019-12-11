@@ -30,23 +30,23 @@ class UserViewSet(viewsets.ModelViewSet):
         else:
             return User.objects.filter(username=user.username).order_by('-date_joined')
 
-    def create(self, request):
+    def create(self, request, *args, **kwargs):
         group = Group.objects.filter(name='candidates')
         user_serializer = UserSerializer(data=request.data)
         user_serializer.is_valid(raise_exception=True)
-        user_serializer.save(groups=group)
-        return Response(status=status.HTTP_201_CREATED)
+        user = user_serializer.save(groups=group)
+        return Response({'id': user.pk}, status=status.HTTP_201_CREATED)
 
     def update(self, request, *args, **kwargs):
         auth_token = request.META.get(HTTP_AUTHORIZATION, '').replace('Token ', '')
         user = Token.objects.get(key=auth_token).user
-        user = User.objects.filter(author=user, pk=kwargs['pk'])
+        user = User.objects.filter(username=user, pk=kwargs['pk'])
         if user:
             user_serializer = UserSerializer(data=request.data)
             user_serializer.is_valid(raise_exception=True)
-            user.user_serializer(username=request.data['username'],
+            user.update(username=request.data['username'],
                                  email=request.data['email'],
                                  password=request.data['password'])
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response({'username': user_serializer.validated_data["username"]}, status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_404_NOT_FOUND)
