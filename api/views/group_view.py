@@ -27,12 +27,15 @@ class GroupViewSet(viewsets.ModelViewSet):
         else:
             return Group.objects.filter(name='invalid')
 
-    def create(self, request):
+    def create(self, request, *args, **kwargs):
         auth_token = request.META.get('HTTP_AUTHORIZATION', '').replace('Token ', '')
         user = Token.objects.get(key=auth_token).user
 
         if user.is_superuser:
-            return super(GroupViewSet, self).create(request)
+            group_serializer = GroupSerializer(data=request.data)
+            group_serializer.is_valid(raise_exception=True)
+            group = group_serializer.save()
+            return Response({'id': group.pk}, status=status.HTTP_201_CREATED)
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 

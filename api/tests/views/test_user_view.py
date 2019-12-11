@@ -175,7 +175,7 @@ class UserViewTest(TestCase):
                 'password': 'cpriority_updated'
         }
 
-        request = RequestFactory().delete('v1/api/users', data=data, pk=user.id, HTTP_AUTHORIZATION=token.key, content_type='application/json')
+        request = RequestFactory().delete('v1/api/users', pk=user.id, HTTP_AUTHORIZATION=token.key, content_type='application/json')
         force_authenticate(request, user=user, token=token)
         resp = UserViewSet.as_view({'delete': 'destroy'})(request, pk=user.id)
 
