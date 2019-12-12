@@ -27,3 +27,10 @@ services:
       - api_db:database
     depends_on:
       - api_db
+
+  qaapit_test:
+    container_name: qaapit_test
+    build: .
+    command: bash -c "python manage.py test"
+    ports:
+      - "8000:8000"
