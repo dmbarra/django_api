@@ -22,6 +22,14 @@ Any help is encouraged. Here are some ways you can contribute:
 * by reporting bugs or suggesting new features on github issue tracker
 * by fixing bugs or implementing features
 
+## Documentation ##
+
+The api documentation was generated using drf_yasg library. There are four endpoints available for viewing the documentation: 
+* /redoc/ - Redoc UI  
+* /swagger/ - Swagger UI
+* /swagger.json
+* /swagger.yaml
+
 ## Maintenance ##
 
 Running in containers;
@@ -49,7 +57,32 @@ the config of local variables is:
         'PORT': os.environ.get('TODO_AVENUE_DATABASE_SERVER_PORT')
 
 <b>Run tests:</b>
-* bundle exec rake test:unit
-* bundle exec rake test:capybara
+* python manage.py test
 
 That will build the containers and do migration after postgres be running.
+
+<b>Apply migrations:</b>
+
+If you are running the application through Docker, here's how you can apply any new migrations to the project:
+
+1. First, make sure all containers are down. Go to the project folder and run:
+    ```console
+    $ docker-compose down
+    ```
+2. Now, build the application container:
+    ```console
+    $ docker-compose build qaapit_app
+    ```
+3. After that, run the container:
+    ```console
+    $ docker-compose up qaapit_app
+    ```
+4. Finally, you can access the container and run your migrations. To do so, run `docker ps` to check the container ID and change it accordingly when running the following command:
+    ```console
+    $ docker ps 
+    CONTAINER ID        IMAGE                    COMMAND                  CREATED             STATUS              PORTS                    NAMES
+    fefff84edd9b        qa-test-api_qaapit_app   "bash -c 'python man…"   7 seconds ago       Up 5 seconds        0.0.0.0:8000->8000/tcp   qaapi_app
+    1bab273ebc1a        postgres                 "docker-entrypoint.s…"   8 seconds ago       Up 7 seconds        0.0.0.0:5432->5432/tcp   qa-test-api_api_db_1
+    $ docker exec -it fefff84edd9b /bin/bash                                                                                                                        develop
+    root@fefff84edd9b:/qaapitest# python manage.py migrate
+    ```

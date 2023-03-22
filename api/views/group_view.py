@@ -9,6 +9,7 @@ from api.serializers.group_serializer import GroupSerializer
 
 
 class GroupViewSet(viewsets.ModelViewSet):
+    swagger_schema = None
     permission_classes = (ActionBasedPermission,)
     action_permissions = {
         IsAuthenticated: ['update', 'partial_update', 'destroy', 'list', 'retrieve', 'create'],

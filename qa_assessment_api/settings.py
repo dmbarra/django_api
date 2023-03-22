@@ -17,6 +17,10 @@ from future.moves import sys
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/2.2/howto/static-files/
+STATIC_ROOT = os.path.join(BASE_DIR, 'api/static')
+STATIC_URL = '/api/static/'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
@@ -27,7 +31,11 @@ SECRET_KEY = '73z=%@p3=uwz0ct3gide*x6-*ot*53axq&mk+!^%165nlo#e@6'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'qa-test-staging.avenuecode.io',
+    'qa-test.avenuecode.com',
+    'localhost',
+]
 
 
 # Application definition
@@ -40,11 +48,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'api',
+    'drf_yasg',
     'rest_framework',
     'rest_framework.authtoken',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -55,6 +66,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'qa_assessment_api.urls'
+CORS_ORIGIN_ALLOW_ALL = True
 
 TEMPLATES = [
     {
@@ -89,7 +101,7 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': 'todo_avenue_development',
+            'NAME': os.environ.get('TODO_AVENUE_DATABASE_NAME'),
             'USER': os.environ.get('TODO_AVENUE_DATABASE_USER'),
             'PASSWORD': os.environ.get('TODO_AVENUE_DATABASE_PASSWORD'),
             'HOST': os.environ.get('TODO_AVENUE_DATABASE_SERVER_NAME'),
@@ -136,12 +148,19 @@ USE_L10N = True
 
 USE_TZ = True
 
+APPEND_SLASH = True
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/2.2/howto/static-files/
+TOKEN_EXPIRED_AFTER_SECONDS = 14400
 
-STATIC_URL = '/static/'
-
+SWAGGER_SETTINGS = {
+   'SECURITY_DEFINITIONS': {
+      'Bearer': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header'
+      }
+   },
+}
 
 # Pagination config
 
@@ -149,7 +168,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
+        'api.authentication.expiring_token_authentication.ExpiringTokenAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticatedOrReadOnly',)

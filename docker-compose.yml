@@ -4,9 +4,9 @@ services:
     restart: always
     image: postgres
     environment:
-      - POSTGRES_USER:"postgres"
-      - POSTGRES_PASSWORD:"postgres"
-      - POSTGRES_DB:"todo_avenue_development"
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=qa-test-api
     ports:
       - "5432:5432"
     volumes:
@@ -17,6 +17,7 @@ services:
     build: .
     environment:
       TODO_AVENUE_DATABASE_SERVER_NAME: "database"
+      TODO_AVENUE_DATABASE_NAME: "qa-test-api"
       TODO_AVENUE_DATABASE_SERVER_PORT: "5432"
       TODO_AVENUE_DATABASE_USER: "postgres"
       TODO_AVENUE_DATABASE_PASSWORD: "postgres"

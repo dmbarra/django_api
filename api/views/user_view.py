@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User, Group
-from rest_framework import viewsets, status
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework import viewsets, status, filters
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -16,9 +17,11 @@ class UserViewSet(viewsets.ModelViewSet):
         IsAuthenticated: ['update', 'partial_update', 'destroy', 'list', 'retrieve', ],
         AllowAny: ['create']
     }
+    search_fields = ['username', 'email']
+    filter_backends = (filters.SearchFilter,)
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    http_method_names = ['get', 'post', 'put']
+    http_method_names = ['get', 'post', 'patch']
 
     def get_queryset(self):
         auth_token = self.request.META.get(HTTP_AUTHORIZATION, '').replace('Token ', '')
@@ -30,23 +33,73 @@ class UserViewSet(viewsets.ModelViewSet):
         else:
             return User.objects.filter(username=user.username).order_by('-date_joined')
 
+    @swagger_auto_schema(
+        responses={
+            status.HTTP_201_CREATED: UserSerializer,
+            status.HTTP_400_BAD_REQUEST: "Bad Request",
+        },
+        security=[],
+        operation_id='Create new user',
+        operation_description='This endpoint to create new user',
+        request_body=UserSerializer,
+    )
     def create(self, request, *args, **kwargs):
-        group = Group.objects.filter(name='candidates')
+        serializer_context = {
+            'request': request,
+        }
+        group, created = Group.objects.get_or_create(name='candidates')
         user_serializer = UserSerializer(data=request.data)
         user_serializer.is_valid(raise_exception=True)
-        user = user_serializer.save(groups=group)
-        return Response({'id': user.pk}, status=status.HTTP_201_CREATED)
+        user = User.objects.create(username=request.data['username'],
+                                   email=request.data['email'],
+                                   first_name=request.data['name']
+                                   )
+        user.set_password(request.data['password'])
+        group.user_set.add(user)
+        user.save()
+        return Response(UserSerializer(user, context=serializer_context,).data, status=status.HTTP_201_CREATED)
 
-    def update(self, request, *args, **kwargs):
+    @swagger_auto_schema(
+        responses={
+            status.HTTP_200_OK: UserSerializer,
+            status.HTTP_404_NOT_FOUND: "Not Found",
+        },
+        operation_id='Update a user',
+        operation_description='This endpoint to update user',
+    )
+    def partial_update(self, request, *args, **kwargs):
+        serializer_context = {
+            'request': request,
+        }
+
         auth_token = request.META.get(HTTP_AUTHORIZATION, '').replace('Token ', '')
-        user = Token.objects.get(key=auth_token).user
-        user = User.objects.filter(username=user, pk=kwargs['pk'])
+        user_name = Token.objects.get(key=auth_token).user
+        user = User.objects.filter(username=user_name, pk=kwargs['pk']).first()
         if user:
-            user_serializer = UserSerializer(data=request.data)
-            user_serializer.is_valid(raise_exception=True)
-            user.update(username=request.data['username'],
-                                 email=request.data['email'],
-                                 password=request.data['password'])
-            return Response({'username': user_serializer.validated_data["username"]}, status=status.HTTP_200_OK)
-        else:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            user_serializer = UserSerializer(user,
+                                             data=request.data,
+                                             context=serializer_context,
+                                             partial=True)
+            if user_serializer.is_valid():
+                user_serializer.save()
+            return Response(user_serializer.data, status=status.HTTP_200_OK)
+
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    @swagger_auto_schema(
+        operation_id='List all users',
+        operation_description='This endpoint to list all users',
+    )
+    def list(self, request, *args, **kwargs):
+        return super(UserViewSet, self).list(request, args, kwargs)
+
+    @swagger_auto_schema(
+        responses={
+            status.HTTP_200_OK: UserSerializer,
+            status.HTTP_404_NOT_FOUND: "Not Found",
+        },
+        operation_id='Retrieve a user',
+        operation_description='This endpoint to retrieve user',
+    )
+    def retrieve(self, request, *args, **kwargs):
+        return super(UserViewSet, self).retrieve(request, args, kwargs)
